@@ -10,12 +10,8 @@ import _filter from 'lodash/filter';
 import _map from 'lodash/map';
 import _hasIn from 'lodash/hasIn';
 
-let movementRight;
-let movementLeft;
-let movementUp;
-let movementDown;
 // const birdSpeed = 2000;
-const stageWidth = 400;
+const stageWidth = 560; // 80 的培數
 const stageHeight = 400;
 const corridorWidth = 80;
 const barriers = [
@@ -52,22 +48,7 @@ class Game extends Component {
 		// console.log('componentWillUpdate');
 		// console.log('this.state', this.state.birdX);
 		// console.log('nextState', nextState.birdX);
-		if (nextState.birdX >= stageWidth - corridorWidth / 2) {
-			console.log('stop moving right');
-			window.clearInterval(movementRight);
-		}
-		if (nextState.birdX <= corridorWidth / 2) {
-			console.log('stop moving left');
-			window.clearInterval(movementLeft);
-		}
-		if (nextState.birdY <= corridorWidth / 2) {
-			console.log('stop moving up');
-			window.clearInterval(movementUp);
-		}
-		if (nextState.birdY >= stageHeight - corridorWidth / 2) {
-			console.log('stop moving down');
-			window.clearInterval(movementDown);
-		}
+
 	}
 
 	componentDidUpdate(prevProps, prevState) {
@@ -75,55 +56,47 @@ class Game extends Component {
 		// 	console.log('right has barrier');
 		// 	window.clearInterval(movementRight);
 		// }
+		// console.log('prevState', prevState.birdX);
+		// console.log('this.state', this.state.birdX);
+		if (prevState.birdX < this.state.birdX) {
+			console.log('right');
+		} else if (prevState.birdX > this.state.birdX) {
+			console.log('left');
+		}
+
+		if (prevState.birdY < this.state.birdY) {
+			console.log('down');
+		} else if (prevState.birdY > this.state.birdY) {
+			console.log('up');
+		}
 	}
 
 	componentWillUnmount() {
-		console.log('componentDidMount');
+		console.log('componentWillUnmount');
 	}
 
 	// start animation
 	moveRight() {
+		// this._animate.linearIn('birdX', stageWidth - corridorWidth, ((stageWidth - this.state.birdX) / stageWidth * birdSpeed));
 		this.setState({
-			birdX: this.state.birdX + corridorWidth,
-			birdColor: 'white'
+			birdX: this.state.birdX + corridorWidth
 		});
-		// movementRight = window.setInterval(() => {
-		// 	this.setState({
-		// 		birdX: this.state.birdX + corridorWidth
-		// 	});
-		// }, 500);
 	}
 
 	moveLeft() {
 		this.setState({
-			birdX: this.state.birdX - corridorWidth,
-			birdColor: 'yellow'
+			birdX: this.state.birdX - corridorWidth
 		});
-		// movementLeft = window.setInterval(() => {
-		// 	this.setState({
-		// 		birdX: this.state.birdX - corridorWidth
-		// 	});
-		// }, 500);
 	}
 	moveUp() {
 		this.setState({
 			birdY: this.state.birdY - corridorWidth
 		});
-		// movementUp = window.setInterval(() => {
-		// 	this.setState({
-		// 		birdY: this.state.birdY - corridorWidth
-		// 	});
-		// }, 500);
 	}
 	moveDown() {
 		this.setState({
 			birdY: this.state.birdY + corridorWidth
 		});
-		// movementDown = window.setInterval(() => {
-		// 	this.setState({
-		// 		birdY: this.state.birdY + corridorWidth
-		// 	});
-		// }, 500);
 	}
 
 	handleKeys(e) {
@@ -131,18 +104,8 @@ class Game extends Component {
 		switch (e.code) {
 			case 'ArrowRight':
 				if (this.state.birdX !== (stageWidth - corridorWidth / 2)) { // not going out the edge
-					// if (this.state.birdY === 200 && this.state.birdX < 160 - corridorWidth / 2) { // check barrier with same y
-					// 	window.clearInterval(movementLeft);
-					// 	window.clearInterval(movementUp);
-					// 	window.clearInterval(movementDown);
-					// 	this.moveRight();
-					// } else if (this.state.birdY === 200 && this.state.birdX >= 160 - corridorWidth / 2) {
-					// 	window.clearInterval(movementRight);
-					// }
-
 					if (_map(_filter(barriers, _matches({y: this.state.birdY})), 'x').indexOf(this.state.birdX + corridorWidth / 2) !== -1) {
 						console.log('right has barrier');
-						// window.clearInterval(movementRight);
 					} else {
 						this.moveRight();
 					}
@@ -151,30 +114,18 @@ class Game extends Component {
 				break;
 			case 'ArrowLeft':
 				if (this.state.birdX !== (corridorWidth / 2)) {
-				// 	window.clearInterval(movementRight);
-				// 	window.clearInterval(movementUp);
-				// 	window.clearInterval(movementDown);
-				// 	this.moveLeft();
 					if (_map(_filter(barriers, _matches({y: this.state.birdY})), 'x').indexOf(this.state.birdX - corridorWidth / 2) !== -1) {
 						console.log('left has barrier');
-						// window.clearInterval(movementRight);
 					} else {
 						this.moveLeft();
 					}
 				}
-				// console.log(_map(_filter(barriers, _matches({y: this.state.birdY})), 'x'));
-
 
 				break;
 			case 'ArrowUp':
 				if (this.state.birdY !== (corridorWidth / 2)) {
-					// window.clearInterval(movementRight);
-					// window.clearInterval(movementLeft);
-					// window.clearInterval(movementDown);
-					// this.moveUp();
 					if (_map(_filter(barriers, _matches({x: this.state.birdX})), 'y').indexOf(this.state.birdY - corridorWidth / 2) !== -1) {
 						console.log('up has barrier');
-						// window.clearInterval(movementRight);
 					} else {
 						this.moveUp();
 					}
@@ -183,13 +134,8 @@ class Game extends Component {
 				break;
 			case 'ArrowDown':
 				if (this.state.birdY !== (stageHeight - corridorWidth / 2)) {
-					// window.clearInterval(movementRight);
-					// window.clearInterval(movementUp);
-					// window.clearInterval(movementLeft);
-					// this.moveDown();
 					if (_map(_filter(barriers, _matches({x: this.state.birdX})), 'y').indexOf(this.state.birdY + corridorWidth / 2) !== -1) {
 						console.log('down has barrier');
-						// window.clearInterval(movementRight);
 					} else {
 						this.moveDown();
 					}
@@ -197,10 +143,7 @@ class Game extends Component {
 
 				break;
 			case 'Space':
-				window.clearInterval(movementRight);
-				window.clearInterval(movementUp);
-				window.clearInterval(movementLeft);
-				window.clearInterval(movementDown);
+				console.log('space');
 
 				break;
 			default:
