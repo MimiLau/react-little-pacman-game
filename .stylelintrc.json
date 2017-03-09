@@ -1,0 +1,11 @@
+{
+	"extends": "stylelint-config-standard",
+	"rules": {
+		"selector-pseudo-element-colon-notation": "single",
+		"indentation": "tab",
+		"comment-empty-line-before": null
+	},
+	"ignoreFiles": [
+		"**/vendor/**/*.scss"
+	]
+}

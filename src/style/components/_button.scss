@@ -1,0 +1,42 @@
+// button override
+.btn-primary {
+	background-color: black;
+	color: yellow;
+	padding-left: 3rem;
+	padding-right: 3rem;
+	border: 2px solid yellow;
+	border-radius: 0;
+
+	&:hover,
+	&:focus,
+	&:active,
+	&:active:hover, &:active:focus, &:active.focus, &.active:hover, &.active:focus, &.active.focus {
+		color: white;
+		background-color: black;
+		border: 2px solid yellow;
+	}
+}
+
+.btn.disabled,
+.btn:disabled,
+button.disabled,
+button:disabled {
+	opacity: 0;
+}
+
+.btn--img {
+	border: none;
+	background: none;
+	padding: 0;
+
+	&:hover,
+	&:active {
+		border: none;
+		background: none;
+	}
+}
+
+.btn-md {
+	padding-left: 3rem;
+	padding-right: 3rem;
+}

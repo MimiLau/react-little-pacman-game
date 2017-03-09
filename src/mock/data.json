@@ -1,0 +1,26 @@
+{
+    "others": [
+		"img/qr-code.png"
+    ],
+    "video": "video/moncler.mp4",
+    "products": [
+		{
+			"name": "Abondance",
+			"img": [
+	        	{"src": "img/products/01-abondance.png"},
+	        	{"src": "img/products/01-abondance_back.png"}
+			],
+			"link": "http://store.moncler.cn/cn/%E9%A3%9E%E8%A1%8C%E5%91%98%E5%A4%B9%E5%85%8B_cod41688403fu.html",
+			"description": "限量版飞行员夹克，专为中国新年独家打造，Moncler 品牌雄鸡徽标呼应鸡年，恭贺新春。双面设计，一面以雅致的印花锦缎呈现，另一面采用经典绗缝设计。繁复金色细节以摩登视角诠释东方美韵，为整体锦上添花"
+	    },
+		{
+			"name": "Didier",
+			"img": [
+	        	{"src": "img/products/02-didier_front.png"},
+		        {"src": "img/products/02-didier_back.png"}
+			],
+			"link": "http://store.moncler.cn/cn/%E9%A3%9E%E8%A1%8C%E5%91%98%E5%A4%B9%E5%85%8B_cod41688319ah.html",
+			"description": "限量版飞行员夹克，专为中国新年独家打造，Moncler 品牌雄鸡徽标呼应鸡年，恭贺新春。双面设计，一面点缀雅致的雄鸡图腾刺绣，另一面采用经典绗缝设计。繁复金色细节以摩登视角诠释东方美韵，为整体锦上添花"
+	    }
+	]
+}

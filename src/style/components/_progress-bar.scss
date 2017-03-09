@@ -1,0 +1,14 @@
+.progress-page {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-color: black;
+}
+
+.loader {
+	padding-top: calc((100vh - 24px) / 2);
+	margin: 0 auto;
+	display: block;
+}

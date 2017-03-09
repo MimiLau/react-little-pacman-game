@@ -1,0 +1,35 @@
+body {
+	margin: 0;
+	background-color: black;
+}
+
+p,
+button,
+.btn,
+ul,
+li,
+label,
+.form-group,
+.form-control {
+	font-size: 0.9rem;
+}
+
+.app {
+	min-height: 100vh;
+	// max-width: 500px;
+	color: $p-color;
+	background-color: black;
+}
+
+.text--xs {
+	font-size: 0.65rem;
+	padding-top: 5px;
+}
+
+.text--sm {
+	font-size: 0.8rem;
+}
+
+.konvajs-content {
+	margin: 0 auto;
+}

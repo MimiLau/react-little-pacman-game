@@ -1,0 +1,100 @@
+.slideshow {
+	height: calc(100vh - #{$height-header}); // 58px is the height of the text
+	overflow: hidden;
+	padding: 0 0 15px;
+	text-align: center;
+	position: relative;
+
+	img {
+		display: inline-block;
+	}
+}
+
+.slider-wrapper {
+	width: 80%;
+	margin: 0 auto;
+}
+
+.slide--intro {
+	height: calc(100vh - #{$height-header} - #{$height-product-name} - #{$height-product-face} - 33px - 15px);
+	position: relative;
+}
+
+.slide--product {
+	position: relative;
+	// height: calc(100vh - #{$height-header} - #{$height-product-name} - #{$height-product-face} - 33px - 15px);
+
+	&-helptext {
+		margin-bottom: 0;
+		color: black;
+		font-size: 0.8rem;
+		position: relative;
+		top: -21px;
+	}
+}
+
+.btn--product {
+	height: calc(100vh - #{$height-header} - #{$height-product-name} - #{$height-product-face} - 33px - 15px - 15px);
+	padding: 10px 0;
+	border: none;
+	background: none;
+
+	img {
+		// opacity: 1;
+		transition: opacity 0.25s ease-in-out;
+	}
+
+	&-fade img {
+		opacity: 0.5;
+	}
+}
+
+.slider-description {
+	position: absolute;
+	top: 0;
+	width: 90%;
+	margin-left: 5%;
+	left: 0;
+	color: black;
+	padding-top: calc((100vh - #{$height-header} - #{$height-product-name} - #{$height-product-face} - 33px - 15px - 15px) / 5);
+	white-space: pre-wrap;
+	line-height: 1.4rem;
+}
+
+.btn--arrow {
+	position: absolute;
+	top: 37%;
+	padding: 0;
+	width: 22px;
+}
+
+.btn--left {
+	left: 0;
+}
+
+.btn--right {
+	right: 0;
+}
+
+.product-face {
+	height: $height-product-face;
+}
+
+.btn--face {
+	padding: 0 0 5px;
+	border: none;
+	background: none;
+	height: calc(#{$height-product-face}); // 15px = margin-bottom
+
+	&:hover,
+	&:focus,
+	&:active {
+		border: none;
+		background: none;
+	}
+}
+
+.btn img {
+	max-width: 100%;
+	max-height: 100%;
+}

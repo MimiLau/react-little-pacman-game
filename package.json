@@ -1,0 +1,50 @@
+{
+  "name": "react-little-pacman-game",
+  "version": "0.1.0",
+  "private": true,
+  "homepage": "",
+  "devDependencies": {
+    "babel-eslint": "^6.1.2",
+    "brfs": "^1.4.3",
+    "eslint": "^3.11.1",
+    "eslint-config-aftership": "^3.1.4",
+    "eslint-plugin-babel": "^3.3.0",
+    "eslint-plugin-import": "^2.1.0",
+    "eslint-plugin-jsx-a11y": "^2.2.3",
+    "eslint-plugin-react": "^6.7.1",
+    "jquery": "^3.1.1",
+    "konva": "^1.4.0",
+    "lodash": "^4.17.2",
+    "node-sass": "^4.0.0",
+    "preload-js": "^0.6.3",
+    "react-addons-css-transition-group": "^15.4.1",
+    "react-canvas": "^1.2.1",
+    "react-konva": "^1.1.1",
+    "react-scripts": "0.7.0",
+    "react-swipeable": "^3.8.0",
+    "react-tween-state": "^0.1.5",
+    "redux-devtools": "^3.3.1",
+    "stylelint-config-standard": "^16.0.0",
+    "transform-loader": "^0.2.4"
+  },
+  "dependencies": {
+    "bootstrap": "^4.0.0-alpha.5",
+    "classnames": "^2.2.5",
+    "import": "0.0.6",
+    "react": "~15.3.2",
+    "react-bootstrap": "^0.30.7",
+    "react-dom": "^15.4.1",
+    "react-redux": "^5.0.1",
+    "react-state-animation": "^0.1.0",
+    "react-switch-case": "^1.0.2",
+    "redux": "^3.6.0"
+  },
+  "scripts": {
+    "start": "npm run watch-css & react-scripts start",
+    "build": "npm run build-css && react-scripts build",
+    "build-css": "node-sass src/style/style.scss src/style/style.css",
+    "watch-css": "node-sass src/style/style.scss src/style/style.css -w",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject"
+  }
+}

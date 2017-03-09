@@ -1,0 +1,21 @@
+// color
+$primary: #3e080b;
+$secondary: #600c10;
+
+$p-color: white;
+
+$gold: #d6a738;
+$gold-light: #f4ce52;
+
+$btn-color: #500c0c;
+
+$border-color: #b50000;
+
+// height
+$height-logo: 60px;
+$height-header: 40px;
+$height-bottom: 63px;
+$height-contents: calc(100vh - #{$height-header + $height-bottom});
+
+$height-product-face: 80px;
+$height-product-name: 46px;
