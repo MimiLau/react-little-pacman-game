@@ -2,25 +2,31 @@ import React, {Component} from 'react';
 import {Layer, Stage, Line, Circle, Ellipse} from 'react-konva';
 
 import _extend from 'lodash/extend';
-import _get from 'lodash/get';
 import _delay from 'lodash/delay';
-import _find from 'lodash/find';
-import _matches from 'lodash/matches';
-import _filter from 'lodash/filter';
-import _map from 'lodash/map';
-import _hasIn from 'lodash/hasIn';
+import _findIndex from 'lodash/findIndex';
 
-// const birdSpeed = 2000;
 const stageWidth = 560; // 80 的培數
 const stageHeight = 400;
-const corridorWidth = 80;
+const stepSize = 80;
 const barriers = [
 	{x: 80, y: 120, w: 5, h: 40, c: '#8664d5'},
 	{x: 80, y: 200, w: 5, h: 40, c: '#b65432'},
 	{x: 320, y: 200, w: 5, h: 40, c: '#b22222'},
 	{x: 320, y: 40, w: 5, h: 40, c: '#985764'},
+	{x: 400, y: 360, w: 5, h: 40, c: '#98b736'},
 
-	{x: 120, y: 80, w: 40, h: 5, c: '#099876'}
+	{x: 120, y: 80, w: 40, h: 5, c: '#099876'},
+	{x: 360, y: 320, w: 40, h: 5, c: '#98b736'}
+];
+const dots = [
+	{x: 40, y: 40, r: 5, c: '#bbb'},
+	{x: 120, y: 40, r: 5, c: '#bbb'},
+	{x: 200, y: 200, r: 5, c: '#bbb'},
+	{x: 280, y: 200, r: 5, c: '#bbb'},
+	{x: 360, y: 40, r: 5, c: '#bbb'},
+	{x: 360, y: 120, r: 5, c: '#bbb'},
+	{x: 360, y: 360, r: 5, c: '#bbb'},
+	{x: 520, y: 360, r: 5, c: '#bbb'}
 ];
 
 class Game extends Component {
@@ -30,9 +36,11 @@ class Game extends Component {
 		this.handleKeys = this.handleKeys.bind(this);
 
 		this.state = {
-			birdX: corridorWidth / 2,
+			birdX: stepSize / 2,
 			birdY: stageHeight / 2,
-			birdColor: 'white'
+			birdColor: 'white',
+			dots: dots,
+			score: 0
 		};
 	}
 	componentWillMount() {
@@ -48,96 +56,76 @@ class Game extends Component {
 		// console.log('componentWillUpdate');
 		// console.log('this.state', this.state.birdX);
 		// console.log('nextState', nextState.birdX);
-
 	}
 
 	componentDidUpdate(prevProps, prevState) {
-		// if (_map(_filter(barriers, _matches({y: this.state.birdY})), 'x').indexOf(this.state.birdX + corridorWidth / 2) !== -1) {
-		// 	console.log('right has barrier');
-		// 	window.clearInterval(movementRight);
-		// }
-		// console.log('prevState', prevState.birdX);
-		// console.log('this.state', this.state.birdX);
-		if (prevState.birdX < this.state.birdX) {
-			console.log('right');
-		} else if (prevState.birdX > this.state.birdX) {
-			console.log('left');
-		}
-
-		if (prevState.birdY < this.state.birdY) {
-			console.log('down');
-		} else if (prevState.birdY > this.state.birdY) {
-			console.log('up');
-		}
-	}
-
-	componentWillUnmount() {
-		console.log('componentWillUnmount');
 	}
 
 	// start animation
-	moveRight() {
-		// this._animate.linearIn('birdX', stageWidth - corridorWidth, ((stageWidth - this.state.birdX) / stageWidth * birdSpeed));
-		this.setState({
-			birdX: this.state.birdX + corridorWidth
-		});
+	move(direction) {
+		if (direction === 'right') {
+			this.setState({
+				birdX: this.state.birdX + stepSize
+			});
+		} else if (direction === 'left') {
+			this.setState({
+				birdX: this.state.birdX - stepSize
+			});
+		} else if (direction === 'up') {
+			this.setState({
+				birdY: this.state.birdY - stepSize
+			});
+		} else if (direction === 'down') {
+			this.setState({
+				birdY: this.state.birdY + stepSize
+			});
+		}
+		this.eatDot();
 	}
 
-	moveLeft() {
-		this.setState({
-			birdX: this.state.birdX - corridorWidth
-		});
-	}
-	moveUp() {
-		this.setState({
-			birdY: this.state.birdY - corridorWidth
-		});
-	}
-	moveDown() {
-		this.setState({
-			birdY: this.state.birdY + corridorWidth
-		});
+	eatDot() {
+		let i = _findIndex(this.state.dots, {x: this.state.birdX, y: this.state.birdY});
+		if (i > -1) {
+			this.setState({
+				dots: _extend(this.state.dots, {
+					[i]: {x: 0, y: 0}
+				}),
+				score: this.state.score + 5
+			});
+		}
 	}
 
 	handleKeys(e) {
-		// e.preventDefault();
+		e.preventDefault();
 		switch (e.code) {
 			case 'ArrowRight':
-				if (this.state.birdX !== (stageWidth - corridorWidth / 2)) { // not going out the edge
-					if (_map(_filter(barriers, _matches({y: this.state.birdY})), 'x').indexOf(this.state.birdX + corridorWidth / 2) !== -1) {
-						console.log('right has barrier');
-					} else {
-						this.moveRight();
+				if (this.state.birdX !== (stageWidth - stepSize / 2)) { // not going out the edge
+					if (_findIndex(barriers, {x: this.state.birdX + stepSize / 2, y: this.state.birdY}) === -1) { // no barrier
+						this.move('right');
 					}
 				}
 
 				break;
 			case 'ArrowLeft':
-				if (this.state.birdX !== (corridorWidth / 2)) {
-					if (_map(_filter(barriers, _matches({y: this.state.birdY})), 'x').indexOf(this.state.birdX - corridorWidth / 2) !== -1) {
-						console.log('left has barrier');
-					} else {
-						this.moveLeft();
+				if (this.state.birdX !== (stepSize / 2)) {
+					if (_findIndex(barriers, {x: this.state.birdX - stepSize / 2, y: this.state.birdY}) === -1) {
+						this.move('left');
 					}
 				}
 
 				break;
 			case 'ArrowUp':
-				if (this.state.birdY !== (corridorWidth / 2)) {
-					if (_map(_filter(barriers, _matches({x: this.state.birdX})), 'y').indexOf(this.state.birdY - corridorWidth / 2) !== -1) {
-						console.log('up has barrier');
-					} else {
-						this.moveUp();
+				if (this.state.birdY !== (stepSize / 2)) {
+					if (_findIndex(barriers, {x: this.state.birdX, y: this.state.birdY - stepSize / 2}) === -1) {
+						this.move('up');
 					}
 				}
 
 				break;
 			case 'ArrowDown':
-				if (this.state.birdY !== (stageHeight - corridorWidth / 2)) {
-					if (_map(_filter(barriers, _matches({x: this.state.birdX})), 'y').indexOf(this.state.birdY + corridorWidth / 2) !== -1) {
-						console.log('down has barrier');
-					} else {
-						this.moveDown();
+				if (this.state.birdY !== (stageHeight - stepSize / 2)) {
+					if (_findIndex(barriers, {x: this.state.birdX, y: this.state.birdY + stepSize / 2}) === -1) {
+						this.move('down');
 					}
 				}
 
@@ -154,9 +142,13 @@ class Game extends Component {
 	render() {
 		// console.log('x:', this.state.birdX);
 		// console.log('y:', this.state.birdY);
-		// console.log('y:', this.state.birdY, '--');
+		let message = '';
+		if (this.state.score === 40) {
+			message = '我真係恭喜你呀';
+		}
 		return (
 			<div className="game">
+				<p>score: {this.state.score}</p>
 				<Stage
 					width={stageWidth}
 					height={stageHeight}
@@ -172,15 +164,25 @@ class Game extends Component {
 								key={i}
 							/>
 						)}
+						{this.state.dots.map((dot, i) =>
+							<Circle
+								radius={5}
+								fill={dot.c}
+								x={dot.x}
+								y={dot.y}
+								key={i}
+								ref={(c) => { this.dot = c; }}
+							/>
+						)}
 						<Line
-							points={[0, corridorWidth * 2, 0, 0, stageWidth, 0, stageWidth, corridorWidth * 2]}
+							points={[0, stepSize * 2, 0, 0, stageWidth, 0, stageWidth, stepSize * 2]}
 							stroke="red"
 							strokeWidth={5}
 							lineCap="round"
 							lineJoin="round"
 						/>
 						<Line
-							points={[0, stageHeight - corridorWidth * 2, 0, stageHeight, stageWidth, stageHeight, stageWidth, stageHeight - corridorWidth * 2]}
+							points={[0, stageHeight - stepSize * 2, 0, stageHeight, stageWidth, stageHeight, stageWidth, stageHeight - stepSize * 2]}
 							stroke="red"
 							strokeWidth={5}
 							lineCap="round"
@@ -195,6 +197,7 @@ class Game extends Component {
 						/>
 					</Layer>
 				</Stage>
+				<p>{message}</p>
 			</div>
 		);
 	}

@@ -1,4 +1,4 @@
-# React little Pac-man Game with Canvas (under development)
+# A little React Game with Canvas (under development)
 
 ## Usage
 
