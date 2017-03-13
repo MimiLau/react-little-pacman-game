@@ -1,32 +1,49 @@
 import React, {Component} from 'react';
-import {Layer, Stage, Line, Circle, Ellipse} from 'react-konva';
+import {Layer, Stage, Circle, Rect, Line} from 'react-konva';
 
 import _extend from 'lodash/extend';
 import _delay from 'lodash/delay';
 import _findIndex from 'lodash/findIndex';
+import _clone from 'lodash/clone';
 
 const stageWidth = 560; // 80 的培數
 const stageHeight = 400;
 const stepSize = 80;
-const barriers = [
-	{x: 80, y: 120, w: 5, h: 40, c: '#8664d5'},
-	{x: 80, y: 200, w: 5, h: 40, c: '#b65432'},
-	{x: 320, y: 200, w: 5, h: 40, c: '#b22222'},
-	{x: 320, y: 40, w: 5, h: 40, c: '#985764'},
-	{x: 400, y: 360, w: 5, h: 40, c: '#98b736'},
 
-	{x: 120, y: 80, w: 40, h: 5, c: '#099876'},
-	{x: 360, y: 320, w: 40, h: 5, c: '#98b736'}
+const verticalBarriers = [
+	{x: 80, y: 120},
+	{x: 80, y: 200},
+	{x: 160, y: 200},
+	{x: 160, y: 280},
+	{x: 320, y: 200},
+	{x: 320, y: 40},
+	{x: 400, y: 360},
+	{x: 240, y: 360}
+];
+const horizontalBarriers = [
+	{x: 120, y: 80},
+	{x: 200, y: 320},
+	{x: 440, y: 160},
+	{x: 520, y: 160},
+	{x: 360, y: 320}
 ];
 const dots = [
-	{x: 40, y: 40, r: 5, c: '#bbb'},
-	{x: 120, y: 40, r: 5, c: '#bbb'},
-	{x: 200, y: 200, r: 5, c: '#bbb'},
-	{x: 280, y: 200, r: 5, c: '#bbb'},
-	{x: 360, y: 40, r: 5, c: '#bbb'},
-	{x: 360, y: 120, r: 5, c: '#bbb'},
-	{x: 360, y: 360, r: 5, c: '#bbb'},
-	{x: 520, y: 360, r: 5, c: '#bbb'}
+	{x: 40, y: 40},
+	{x: 120, y: 40},
+	{x: 200, y: 200},
+	{x: 280, y: 200},
+	{x: 360, y: 40},
+	{x: 360, y: 120},
+	{x: 360, y: 360},
+	{x: 520, y: 360},
+	{x: 520, y: 200}
+];
+const foods = [
+	{x: 280, y: 40},
+	{x: 280, y: 360},
+	{x: 520, y: 120},
+	{x: 120, y: 280},
+	{x: 440, y: 280}
 ];
 
 class Game extends Component {
@@ -34,12 +51,14 @@ class Game extends Component {
 		super(props);
 
 		this.handleKeys = this.handleKeys.bind(this);
+		this.restart = this.restart.bind(this);
 
 		this.state = {
 			birdX: stepSize / 2,
 			birdY: stageHeight / 2,
-			birdColor: 'white',
-			dots: dots,
+			birdColor: 'yellow',
+			dots: _clone(dots),
+			foods: _clone(foods),
 			score: 0
 		};
 	}
@@ -88,11 +107,31 @@ class Game extends Component {
 		if (i > -1) {
 			this.setState({
 				dots: _extend(this.state.dots, {
-					[i]: {x: 0, y: 0}
+					[i]: {x: -40, y: -40}
 				}),
 				score: this.state.score + 5
 			});
 		}
+		let h = _findIndex(this.state.foods, {x: this.state.birdX, y: this.state.birdY});
+		if (h > -1) {
+			this.setState({
+				foods: _extend(this.state.foods, {
+					[h]: {x: -40, y: -40}
+				}),
+				score: this.state.score + 10
+			});
+		}
+	}
+
+	restart() {
+		this.setState({
+			birdX: stepSize / 2,
+			birdY: stageHeight / 2,
+			birdColor: 'yellow',
+			dots: _clone(dots),
+			foods: _clone(foods),
+			score: 0
+		});
 	}
 
 	handleKeys(e) {
@@ -100,7 +139,7 @@ class Game extends Component {
 		switch (e.code) {
 			case 'ArrowRight':
 				if (this.state.birdX !== (stageWidth - stepSize / 2)) { // not going out the edge
-					if (_findIndex(barriers, {x: this.state.birdX + stepSize / 2, y: this.state.birdY}) === -1) { // no barrier
+					if (_findIndex(verticalBarriers, {x: this.state.birdX + stepSize / 2, y: this.state.birdY}) === -1) { // no barrier
 						this.move('right');
 					}
 				}
@@ -108,7 +147,7 @@ class Game extends Component {
 				break;
 			case 'ArrowLeft':
 				if (this.state.birdX !== (stepSize / 2)) {
-					if (_findIndex(barriers, {x: this.state.birdX - stepSize / 2, y: this.state.birdY}) === -1) {
+					if (_findIndex(verticalBarriers, {x: this.state.birdX - stepSize / 2, y: this.state.birdY}) === -1) {
 						this.move('left');
 					}
 				}
@@ -116,7 +155,7 @@ class Game extends Component {
 				break;
 			case 'ArrowUp':
 				if (this.state.birdY !== (stepSize / 2)) {
-					if (_findIndex(barriers, {x: this.state.birdX, y: this.state.birdY - stepSize / 2}) === -1) {
+					if (_findIndex(horizontalBarriers, {x: this.state.birdX, y: this.state.birdY - stepSize / 2}) === -1) {
 						this.move('up');
 					}
 				}
@@ -124,7 +163,7 @@ class Game extends Component {
 				break;
 			case 'ArrowDown':
 				if (this.state.birdY !== (stageHeight - stepSize / 2)) {
-					if (_findIndex(barriers, {x: this.state.birdX, y: this.state.birdY + stepSize / 2}) === -1) {
+					if (_findIndex(horizontalBarriers, {x: this.state.birdX, y: this.state.birdY + stepSize / 2}) === -1) {
 						this.move('down');
 					}
 				}
@@ -143,53 +182,89 @@ class Game extends Component {
 		// console.log('x:', this.state.birdX);
 		// console.log('y:', this.state.birdY);
 		let message = '';
-		if (this.state.score === 40) {
+		let fullScore = this.state.dots.length * 5 + this.state.foods.length * 10;
+		if (this.state.score === fullScore) {
 			message = '我真係恭喜你呀';
 		}
 		return (
 			<div className="game">
 				<p>score: {this.state.score}</p>
+				<button onClick={this.restart}>restart</button>
 				<Stage
-					width={stageWidth}
-					height={stageHeight}
+					width={stageWidth + 40}
+					height={stageHeight + 40}
 				>
 					<Layer>
-						{barriers.map((barrier, i) =>
-							<Ellipse
+						<Rect
+							x={0}
+							y={0}
+							width={stageWidth + 40}
+							height={stageHeight + 40}
+							fillRadialGradientStartPointX={stageWidth / 2}
+							fillRadialGradientStartPointY={stageHeight / 2}
+							fillRadialGradientEndPointX={stageWidth / 2}
+							fillRadialGradientEndPointY={stageHeight / 2}
+							fillRadialGradientStartRadius={stageWidth / 2}
+							fillRadialGradientColorStops={[0, '#255180', 1, '#307ea4']}
+						/>
+					</Layer>
+					<Layer
+						offsetX="-20"
+						offsetY="-20"
+					>
+						<Line
+							points={[0, 0, stageWidth, 0, stageWidth, stageHeight, 0, stageHeight, 0, 0]}
+							stroke="#60e8f4"
+							strokeWidth="5"
+							lineCap="round"
+							lineJoin="round"
+						/>
+						{verticalBarriers.map((barrier, i) =>
+							<Rect
 								x={barrier.x}
 								y={barrier.y}
-								radiusX={barrier.w}
-								radiusY={barrier.h}
-								fill={barrier.c}
+								width="5"
+								height={stepSize}
+								fill="#60e8f4"
+								OffsetY={stepSize / 2}
 								key={i}
+								cornerRadius="3"
+							/>
+						)}
+						{horizontalBarriers.map((barrier, i) =>
+							<Rect
+								x={barrier.x}
+								y={barrier.y}
+								width={stepSize}
+								height="5"
+								fill="#60e8f4"
+								OffsetX={stepSize / 2}
+								key={i}
+								cornerRadius="3"
 							/>
 						)}
 						{this.state.dots.map((dot, i) =>
 							<Circle
-								radius={5}
-								fill={dot.c}
+								radius="5"
+								fill="#fff"
 								x={dot.x}
 								y={dot.y}
 								key={i}
 								ref={(c) => { this.dot = c; }}
 							/>
 						)}
-						<Line
-							points={[0, stepSize * 2, 0, 0, stageWidth, 0, stageWidth, stepSize * 2]}
-							stroke="red"
-							strokeWidth={5}
-							lineCap="round"
-							lineJoin="round"
-						/>
-						<Line
-							points={[0, stageHeight - stepSize * 2, 0, stageHeight, stageWidth, stageHeight, stageWidth, stageHeight - stepSize * 2]}
-							stroke="red"
-							strokeWidth={5}
-							lineCap="round"
-							lineJoin="round"
-						/>
+						{this.state.foods.map((food, i) =>
+							<Circle
+								radius="10"
+								fill="#fff"
+								x={food.x}
+								y={food.y}
+								key={i}
+								ref={(c) => { this.food = c; }}
+							/>
+						)}
 						<Circle
-							radius={15}
+							radius="15"
 							fill={this.state.birdColor}
 							x={this.state.birdX}
 							y={this.state.birdY}
