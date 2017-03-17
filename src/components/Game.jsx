@@ -216,7 +216,7 @@ class Game extends Component {
 
 	died() {
 		window.clearInterval(ghostMovement);
-		console.log('died!!');
+		// console.log('died!!');
 		if (this.state.message !== 'died!!') {
 			this.setState({
 				message: 'died!!'
@@ -226,7 +226,7 @@ class Game extends Component {
 
 	win() {
 		window.clearInterval(ghostMovement);
-		console.log('我真係恭喜你呀!!');
+		// console.log('我真係恭喜你呀!!');
 		if (this.state.message !== '我真係恭喜你呀!!') {
 			this.setState({
 				message: '我真係恭喜你呀!!'
