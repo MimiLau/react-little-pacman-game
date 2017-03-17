@@ -1,5 +1,7 @@
 # A little React Game with Canvas (under development)
 
+![Pac-man-like game](screenshot.png)
+
 ## Usage
 
 Install modules to app
