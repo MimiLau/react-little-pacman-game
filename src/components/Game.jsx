@@ -1,10 +1,12 @@
 import React, {Component} from 'react';
 import {Layer, Stage, Circle, Rect, Line} from 'react-konva';
+import ReactStateAnimation from 'react-state-animation';
 
 import _extend from 'lodash/extend';
 import _delay from 'lodash/delay';
 import _findIndex from 'lodash/findIndex';
 import _clone from 'lodash/clone';
+import _sample from 'lodash/sample';
 
 const stageWidth = 560; // 80 的培數
 const stageHeight = 400;
@@ -17,7 +19,6 @@ const verticalBarriers = [
 	{x: 160, y: 280},
 	{x: 320, y: 200},
 	{x: 320, y: 40},
-	{x: 400, y: 360},
 	{x: 240, y: 360}
 ];
 const horizontalBarriers = [
@@ -29,9 +30,10 @@ const horizontalBarriers = [
 ];
 const dots = [
 	{x: 40, y: 40},
+	{x: 40, y: 360},
 	{x: 120, y: 40},
 	{x: 200, y: 200},
-	{x: 280, y: 200},
+	// {x: 280, y: 200},
 	{x: 360, y: 40},
 	{x: 360, y: 120},
 	{x: 360, y: 360},
@@ -45,6 +47,11 @@ const foods = [
 	{x: 120, y: 280},
 	{x: 440, y: 280}
 ];
+const ghosts = [
+	{x: 280, y: 200, name: 'siufa'},
+	{x: 440, y: 200, name: 'mama'}
+];
+let ghostMovement;
 
 class Game extends Component {
 	constructor(props) {
@@ -59,16 +66,24 @@ class Game extends Component {
 			birdColor: 'yellow',
 			dots: _clone(dots),
 			foods: _clone(foods),
-			score: 0
+			ghostX: _clone(ghosts[0].x),
+			ghostY: _clone(ghosts[0].y),
+			score: 0,
+			message: ''
 		};
+
+		this._animate = new ReactStateAnimation(this);
 	}
 	componentWillMount() {
 		// 会在组件render之前执行，并且永远都只执行一次。
+		console.log('componentWillMount');
 	}
 
 	componentDidMount() {
 		window.addEventListener('keydown', this.handleKeys);
 		// 这个方法会在组件加载完毕之后立即执行
+		console.log('componentDidMount');
+		this.ghostWalk();
 	}
 
 	componentWillUpdate(nextProps, nextState) {
@@ -78,6 +93,13 @@ class Game extends Component {
 	}
 
 	componentDidUpdate(prevProps, prevState) {
+		if (this.state.ghostX === this.state.birdX && this.state.ghostY === this.state.birdY) {
+			this.died();
+		}
+		let fullScore = this.state.dots.length * 5 + this.state.foods.length * 10;
+		if (this.state.score === fullScore) {
+			this.win();
+		}
 	}
 
 	// start animation
@@ -102,7 +124,48 @@ class Game extends Component {
 		this.eatDot();
 	}
 
+	ghostMove(direction) {
+		// console.log(direction);
+		let noRightBarrier = _findIndex(verticalBarriers, {x: this.state.ghostX + stepSize / 2, y: this.state.ghostY}) === -1;
+		let noLeftBarrier = _findIndex(verticalBarriers, {x: this.state.ghostX - stepSize / 2, y: this.state.ghostY}) === -1;
+		let noUpBarrier = _findIndex(horizontalBarriers, {x: this.state.ghostX, y: this.state.ghostY - stepSize / 2}) === -1;
+		let noDownBarrier = _findIndex(horizontalBarriers, {x: this.state.ghostX, y: this.state.ghostY + stepSize / 2}) === -1;
+
+		if (direction === 'right' && noRightBarrier) {
+			if (this.state.ghostX !== (stageWidth - stepSize / 2)) {
+				// this._animate.linearIn('ghostX', this.state.ghostX + stepSize, 1000);
+				this.setState({
+					ghostX: this.state.ghostX + stepSize
+				});
+			}
+		} else if (direction === 'left' && noLeftBarrier) {
+			if (this.state.ghostX !== (stepSize / 2)) {
+				// this._animate.linearIn('ghostX', this.state.ghostX - stepSize, 1000);
+				this.setState({
+					ghostX: this.state.ghostX - stepSize
+				});
+			}
+		} else if (direction === 'up' && noUpBarrier) {
+			if (this.state.ghostY !== (stepSize / 2)) {
+				// this._animate.linearIn('ghostY', this.state.ghostY - stepSize, 1000);
+				this.setState({
+					ghostY: this.state.ghostY - stepSize
+				});
+			}
+		} else if (direction === 'down' && noDownBarrier) {
+			if (this.state.ghostY !== (stageHeight - stepSize / 2)) {
+				// this._animate.linearIn('ghostY', this.state.ghostY + stepSize, 1000);
+				this.setState({
+					ghostY: this.state.ghostY + stepSize
+				});
+			}
+		} else {
+			console.log('sleeping');
+		}
+	}
+
 	eatDot() {
+		// small dots
 		let i = _findIndex(this.state.dots, {x: this.state.birdX, y: this.state.birdY});
 		if (i > -1) {
 			this.setState({
@@ -112,6 +175,8 @@ class Game extends Component {
 				score: this.state.score + 5
 			});
 		}
+
+		// big dots
 		let h = _findIndex(this.state.foods, {x: this.state.birdX, y: this.state.birdY});
 		if (h > -1) {
 			this.setState({
@@ -123,6 +188,17 @@ class Game extends Component {
 		}
 	}
 
+	ghostWalk() {
+		// random walk {direction} every 1000
+		// if has barrier, random walk {direction}
+
+		console.log('ghostWalk');
+
+		ghostMovement = window.setInterval(() => {
+			this.ghostMove(_sample(['left', 'right', 'up', 'down']));
+		}, 1000);
+	}
+
 	restart() {
 		this.setState({
 			birdX: stepSize / 2,
@@ -130,16 +206,45 @@ class Game extends Component {
 			birdColor: 'yellow',
 			dots: _clone(dots),
 			foods: _clone(foods),
-			score: 0
+			score: 0,
+			ghostX: _clone(ghosts[0].x),
+			ghostY: _clone(ghosts[0].y),
+			message: ''
 		});
+		this.ghostWalk();
+	}
+
+	died() {
+		window.clearInterval(ghostMovement);
+		console.log('died!!');
+		if (this.state.message !== 'died!!') {
+			this.setState({
+				message: 'died!!'
+			});
+		}
+	}
+
+	win() {
+		window.clearInterval(ghostMovement);
+		console.log('我真係恭喜你呀!!');
+		if (this.state.message !== '我真係恭喜你呀!!') {
+			this.setState({
+				message: '我真係恭喜你呀!!'
+			});
+		}
 	}
 
 	handleKeys(e) {
 		e.preventDefault();
+		let noRightBarrier = _findIndex(verticalBarriers, {x: this.state.birdX + stepSize / 2, y: this.state.birdY}) === -1;
+		let noLeftBarrier = _findIndex(verticalBarriers, {x: this.state.birdX - stepSize / 2, y: this.state.birdY}) === -1;
+		let noUpBarrier = _findIndex(horizontalBarriers, {x: this.state.birdX, y: this.state.birdY - stepSize / 2}) === -1;
+		let noDownBarrier = _findIndex(horizontalBarriers, {x: this.state.birdX, y: this.state.birdY + stepSize / 2}) === -1;
+
 		switch (e.code) {
 			case 'ArrowRight':
 				if (this.state.birdX !== (stageWidth - stepSize / 2)) { // not going out the edge
-					if (_findIndex(verticalBarriers, {x: this.state.birdX + stepSize / 2, y: this.state.birdY}) === -1) { // no barrier
+					if (noRightBarrier) { // no barrier
 						this.move('right');
 					}
 				}
@@ -147,7 +252,7 @@ class Game extends Component {
 				break;
 			case 'ArrowLeft':
 				if (this.state.birdX !== (stepSize / 2)) {
-					if (_findIndex(verticalBarriers, {x: this.state.birdX - stepSize / 2, y: this.state.birdY}) === -1) {
+					if (noLeftBarrier) {
 						this.move('left');
 					}
 				}
@@ -155,7 +260,7 @@ class Game extends Component {
 				break;
 			case 'ArrowUp':
 				if (this.state.birdY !== (stepSize / 2)) {
-					if (_findIndex(horizontalBarriers, {x: this.state.birdX, y: this.state.birdY - stepSize / 2}) === -1) {
+					if (noUpBarrier) {
 						this.move('up');
 					}
 				}
@@ -163,7 +268,7 @@ class Game extends Component {
 				break;
 			case 'ArrowDown':
 				if (this.state.birdY !== (stageHeight - stepSize / 2)) {
-					if (_findIndex(horizontalBarriers, {x: this.state.birdX, y: this.state.birdY + stepSize / 2}) === -1) {
+					if (noDownBarrier) {
 						this.move('down');
 					}
 				}
@@ -171,6 +276,7 @@ class Game extends Component {
 				break;
 			case 'Space':
 				console.log('space');
+				window.clearInterval(ghostMovement);
 
 				break;
 			default:
@@ -181,11 +287,6 @@ class Game extends Component {
 	render() {
 		// console.log('x:', this.state.birdX);
 		// console.log('y:', this.state.birdY);
-		let message = '';
-		let fullScore = this.state.dots.length * 5 + this.state.foods.length * 10;
-		if (this.state.score === fullScore) {
-			message = '我真係恭喜你呀';
-		}
 		return (
 			<div className="game">
 				<p>score: {this.state.score}</p>
@@ -270,9 +371,16 @@ class Game extends Component {
 							y={this.state.birdY}
 							ref={(c) => { this.bird = c; }}
 						/>
+						<Circle
+							radius="10"
+							fill="black"
+							x={this.state.ghostX}
+							y={this.state.ghostY}
+							ref={(c) => { this.ghost0 = c; }}
+						/>
 					</Layer>
 				</Stage>
-				<p>{message}</p>
+				<p>{this.state.message}</p>
 			</div>
 		);
 	}
